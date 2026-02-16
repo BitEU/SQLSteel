@@ -18,8 +18,6 @@ void get_field_string(const char *field, SuspectRecord *rec, char *dest, int max
         PLATFORM_STRCPY(dest, max_len, rec->name);
     } else if (strcmp(field, "CITY") == 0) {
         PLATFORM_STRCPY(dest, max_len, rec->city);
-    } else if (strcmp(field, "NOTES") == 0) {
-        PLATFORM_STRCPY(dest, max_len, rec->notes);
     } else {
         dest[0] = '\0';
     }
@@ -172,7 +170,7 @@ void execute_insert(Parser *parser) {
     }
     
     /* Parse INSERT INTO suspects VALUES (...) */
-    /* Simplified: expects 4 values in order */
+    /* Simplified: expects 3 values in order */
     int value_start = 0;
     for (i = 0; i < parser->token_count; i++) {
         if (parser->tokens[i].type == TOKEN_VALUES) {
@@ -183,7 +181,7 @@ void execute_insert(Parser *parser) {
     
     if (value_start == 0) {
         printf("ERROR: INVALID INSERT SYNTAX\n");
-        printf("USAGE: INSERT INTO SUSPECTS VALUES ('NAME', 'CITY', AGE, 'NOTES')\n");
+        printf("USAGE: INSERT INTO SUSPECTS VALUES ('NAME', 'CITY', AGE)\n");
         return;
     }
     
@@ -197,7 +195,7 @@ void execute_insert(Parser *parser) {
     new_rec.active = 1;
     new_rec.id = slot + 1;
     
-    while (val_idx < parser->token_count && field_num < 4) {
+    while (val_idx < parser->token_count && field_num < 3) {
         if (parser->tokens[val_idx].type == TOKEN_COMMA) {
             val_idx++;
             continue;
@@ -214,22 +212,19 @@ void execute_insert(Parser *parser) {
             case 2: /* AGE */
                 new_rec.age = atoi(parser->tokens[val_idx].value);
                 break;
-            case 3: /* NOTES */
-                PLATFORM_STRCPY(new_rec.notes, MAX_NOTES_LEN, parser->tokens[val_idx].value);
-                break;
         }
         
         field_num++;
         val_idx++;
     }
     
-    if (field_num == 4) {
+    if (field_num == 3) {
         g_database[slot] = new_rec;
         g_record_count++;
         printf("RECORD INSERTED: ID=%d (NAME: %s)\n", new_rec.id, new_rec.name);
     } else {
-        printf("ERROR: INSUFFICIENT VALUES (EXPECTED 4, GOT %d)\n", field_num);
-        printf("USAGE: INSERT INTO SUSPECTS VALUES ('NAME', 'CITY', AGE, 'NOTES')\n");
+        printf("ERROR: INSUFFICIENT VALUES (EXPECTED 3, GOT %d)\n", field_num);
+        printf("USAGE: INSERT INTO SUSPECTS VALUES ('NAME', 'CITY', AGE)\n");
     }
 }
 
@@ -321,8 +316,6 @@ void execute_update(Parser *parser) {
                 /* Apply update */
                 if (strcmp(update_field, "AGE") == 0) {
                     g_database[i].age = atoi(update_value);
-                } else if (strcmp(update_field, "NOTES") == 0) {
-                    PLATFORM_STRCPY(g_database[i].notes, MAX_NOTES_LEN, update_value);
                 }
                 count++;
             }

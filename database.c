@@ -49,14 +49,6 @@ static const char *cities[] = {
     "LAS VEGAS", "PORTLAND", "MINNEAPOLIS", "ST LOUIS"
 };
 
-static const char *notes[] = {
-    "FREQUENT USSR CONTACTS", "UNEXPLAINED WEALTH", "CODED MESSAGES",
-    "DEAD DROP OBSERVED", "KNOWN ASSOCIATES", "EMBASSY MEETINGS",
-    "SUSPICIOUS TRAVEL", "DOCUMENTS MISSING", "FAILED POLYGRAPH",
-    "ANONYMOUS TIP", "PHONE TAP EVIDENCE", "UNDER SURVEILLANCE",
-    "FINANCIAL IRREGULARITIES", "HANDLER IDENTIFIED", "SAFE HOUSE VISITS"
-};
-
 /* XORshift pseudo-random number generator (UNIVAC compatible) */
 static unsigned long g_xorshift_state = 0;
 
@@ -130,9 +122,8 @@ void load_demo_data(void) {
         /* Generate random name */
         generate_random_name(g_database[i].name, MAX_NAME_LEN);
 
-        /* Assign city, notes using portable string copy */
+        /* Assign city using portable string copy */
         PLATFORM_STRCPY(g_database[i].city, MAX_CITY_LEN, cities[pseudo_rand() % 20]);
-        PLATFORM_STRCPY(g_database[i].notes, MAX_NOTES_LEN, notes[pseudo_rand() % 15]);
 
         /* Generate realistic data */
         g_database[i].age = 25 + (pseudo_rand() % 40);

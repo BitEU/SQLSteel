@@ -59,7 +59,6 @@
 #define MAX_RECORDS 100
 #define MAX_NAME_LEN 24
 #define MAX_CITY_LEN 20
-#define MAX_NOTES_LEN 30
 #define MAX_SQL_LEN 256
 #define MAX_TOKENS 20
 #define MAX_TOKEN_LEN 32
@@ -70,7 +69,6 @@ typedef struct {
     char name[MAX_NAME_LEN];
     char city[MAX_CITY_LEN];
     sql_int_t age;
-    char notes[MAX_NOTES_LEN];
     sql_int_t active;               /* 1=active, 0=deleted */
 } SuspectRecord;
 

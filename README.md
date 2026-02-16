@@ -1,6 +1,6 @@
 # SQLSteel - Ultra-Lightweight In-Memory Database for UNIVAC 1219
 
-An ultra-minimal SQL database engine. Everything runs in RAM - no disk I/O or persistence whatsoever.
+An ultra-minimal SQL database engine. Everything runs in memory - no disk I/O or persistence whatsoever.
 
 ## Architecture
 
@@ -19,14 +19,12 @@ display.c       - Output formatting
 - 100+ first names
 - 100+ last names  
 - 20 cities
-- 15 note types
 
 Each record contains:
 - ID (unique identifier)
 - Name (randomly generated)
 - City
 - Age
-- Notes
 
 ## SQL Command Examples
 
@@ -38,14 +36,13 @@ SELECT * FROM SUSPECTS WHERE AGE > 30 AND CITY = 'NEW YORK';
 
 ### INSERT Records
 ```sql
-INSERT INTO SUSPECTS VALUES ('JOHN DOE', 'BOSTON', 35, 'SUSPICIOUS');
-INSERT INTO SUSPECTS VALUES ('JANE SMITH', 'CHICAGO', 42, 'HIGH PRIORITY');
+INSERT INTO SUSPECTS VALUES ('JOHN DOE', 'BOSTON', 35);
+INSERT INTO SUSPECTS VALUES ('JANE SMITH', 'CHICAGO', 42);
 ```
 
 ### UPDATE Records
 ```sql
 UPDATE SUSPECTS SET AGE = 40 WHERE ID = 5;
-UPDATE SUSPECTS SET NOTES = 'CLEARED' WHERE AGE < 25;
 ```
 
 ### DELETE Records

@@ -30,21 +30,19 @@ void cmd_help(void) {
     printf("   SELECT * FROM SUSPECTS;\n");
     printf("   SELECT * FROM SUSPECTS WHERE AGE > 30 AND CITY = 'NEW YORK';\n");
     printf("\n2. INSERT:\n");
-    printf("   INSERT INTO SUSPECTS VALUES ('NAME', 'CITY', AGE, 'NOTES');\n");
-    printf("   Example: INSERT INTO SUSPECTS VALUES ('JOHN DOE', 'BOSTON', 35, 'SUSPICIOUS');\n");
+    printf("   INSERT INTO SUSPECTS VALUES ('NAME', 'CITY', AGE);\n");
+    printf("   Example: INSERT INTO SUSPECTS VALUES ('JOHN DOE', 'BOSTON', 35);\n");
     printf("\n3. UPDATE:\n");
     printf("   UPDATE SUSPECTS SET AGE = 40 WHERE ID = 5;\n");
-    printf("   UPDATE SUSPECTS SET NOTES = 'CLEARED' WHERE AGE < 25;\n");
     printf("\n4. DELETE:\n");
     printf("   DELETE FROM SUSPECTS WHERE ID = 5;\n");
     printf("\nOTHER COMMANDS:\n");
     printf("   STATS - Show database statistics\n");
     printf("   HELP  - Show this menu\n");
     printf("   EXIT  - Terminate program\n");
-    printf("\nFIELDS: ID, NAME, CITY, AGE, NOTES\n");
+    printf("\nFIELDS: ID, NAME, CITY, AGE\n");
     printf("OPERATORS: =, >, <, >=, <=, AND\n");
-    printf("\nMEMORY: ALL DATA IN RAM - NO DISK STORAGE\n");
-    printf("PLATFORM: UNIVAC 1219 (40KB MEMORY LIMIT)\n");
+    printf("\nMEMORY: NO DISK STORAGE\n");
 }
 
 /* Main program */

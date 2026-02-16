@@ -8,7 +8,7 @@
 /* Print table header */
 void print_header(void) {
     print_separator();
-    printf("| ID  | NAME                 | CITY             | OCCUPATION       | AGE | SUSP | CONTACTS | REPORTS |\n");
+    printf("# ID  # NAME                 # CITY             # OCCUPATION       # AGE # SUSP # CONTACTS # REPORTS #\n");
     print_separator();
 }
 
@@ -20,7 +20,7 @@ void print_separator(void) {
 /* Print single record (table format) */
 void print_record(SuspectRecord *rec) {
     if (rec->active) {
-        printf("| %-3d | %-20s | %-16s | %-16s | %-3d | %-4d | %-8d | %-7d |\n",
+        printf("# %-3d # %-20s # %-16s # %-16s # %-3d # %-4d # %-8d # %-7d #\n",
                rec->id, rec->name, rec->city, rec->occupation,
                rec->age, rec->suspicion_level, rec->contacts_monitored, rec->reports_filed);
     }

@@ -56,21 +56,23 @@
 #endif
 
 /* Memory constraints for UNIVAC (40kB total) */
-#define MAX_RECORDS 100
-#define MAX_NAME_LEN 24
-#define MAX_CITY_LEN 20
+#define MAX_RECORDS 118
+#define MAX_NAME_LEN 14
+#define MAX_SYMBOL_LEN 4
+#define MAX_SERIES_LEN 22
 #define MAX_SQL_LEN 256
 #define MAX_TOKENS 20
 #define MAX_TOKEN_LEN 32
 
-/* Table structure - Suspected Soviet Sympathies Database */
+/* Table structure - Periodic Table of Elements Database */
 typedef struct {
-    sql_int_t id;
-    char name[MAX_NAME_LEN];
-    char city[MAX_CITY_LEN];
-    sql_int_t age;
+    sql_int_t element_number;
+    char element_name[MAX_NAME_LEN];
+    char symbol[MAX_SYMBOL_LEN];
+    double atomic_weight;
+    char series[MAX_SERIES_LEN];
     sql_int_t active;               /* 1=active, 0=deleted */
-} SuspectRecord;
+} ElementRecord;
 
 /* SQL Token Types */
 typedef enum {
@@ -154,17 +156,18 @@ void execute_delete(Parser *parser);
 void execute_update(Parser *parser);
 
 /* Function prototypes - Query evaluation */
-int evaluate_where_clause(Parser *parser, SuspectRecord *rec, int *pos);
-int evaluate_condition(const char *field, const char *op, const char *value, SuspectRecord *rec);
+int evaluate_where_clause(Parser *parser, ElementRecord *rec, int *pos);
+int evaluate_condition(const char *field, const char *op, const char *value, ElementRecord *rec);
 int pattern_match(const char *text, const char *pattern);
-int get_field_value(const char *field, SuspectRecord *rec);
-void get_field_string(const char *field, SuspectRecord *rec, char *dest, int max_len);
+int get_field_value(const char *field, ElementRecord *rec);
+double get_field_double(const char *field, ElementRecord *rec);
+void get_field_string(const char *field, ElementRecord *rec, char *dest, int max_len);
 
 /* Function prototypes - Display */
 void print_header(void);
-void print_record(SuspectRecord *rec);
+void print_record(ElementRecord *rec);
 void print_separator(void);
-void print_full_record(SuspectRecord *rec);
+void print_full_record(ElementRecord *rec);
 
 /* Function prototypes - Utilities */
 void to_upper(char *str);
@@ -173,7 +176,7 @@ void skip_whitespace(const char **p);
 const char* get_next_token(const char *sql, char *token, int max_len);
 
 /* Global database */
-extern SuspectRecord g_database[MAX_RECORDS];
+extern ElementRecord g_database[MAX_RECORDS];
 extern sql_int_t g_record_count;
 
 #endif /* SQLSTEEL_H */

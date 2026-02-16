@@ -4,7 +4,7 @@
  * 
  * Memory Budget: 40kB total
  * Features: Full SQL parser with SELECT, INSERT, DELETE, UPDATE
- * Data: 100 records of "Suspected Soviet Sympathies" surveillance data
+ * Data: 118 elements from the Periodic Table
  * 
  * Designed for 1960s UNIVAC - All data stored in runtime memory
  * No disk I/O - everything created and destroyed in memory
@@ -27,18 +27,19 @@ void cmd_help(void) {
     printf("\n=== SQLSTEEL - SQL COMMAND REFERENCE ===\n");
     printf("\nSUPPORTED SQL COMMANDS:\n");
     printf("\n1. SELECT:\n");
-    printf("   SELECT * FROM SUSPECTS;\n");
-    printf("   SELECT * FROM SUSPECTS WHERE AGE > 30 AND CITY = 'NEW YORK';\n");
-    printf("   SELECT DISTINCT * FROM SUSPECTS WHERE CITY = 'BOSTON';\n");
-    printf("   SELECT * FROM SUSPECTS ORDER BY AGE DESC LIMIT 10;\n");
-    printf("   SELECT * FROM SUSPECTS WHERE NAME LIKE 'JOHN%%' ORDER BY NAME;\n");
+    printf("   SELECT * FROM ELEMENTS;\n");
+    printf("   SELECT * FROM ELEMENTS WHERE ATOMIC_WEIGHT > 100;\n");
+    printf("   SELECT DISTINCT * FROM ELEMENTS WHERE SERIES = 'NOBLE GAS';\n");
+    printf("   SELECT * FROM ELEMENTS ORDER BY ATOMIC_WEIGHT DESC LIMIT 10;\n");
+    printf("   SELECT * FROM ELEMENTS WHERE ELEMENT_NAME LIKE 'CARBON%%';\n");
     printf("\n2. INSERT:\n");
-    printf("   INSERT INTO SUSPECTS VALUES ('NAME', 'CITY', AGE);\n");
-    printf("   Example: INSERT INTO SUSPECTS VALUES ('JOHN DOE', 'BOSTON', 35);\n");
+    printf("   INSERT INTO ELEMENTS VALUES ('NAME', 'SYMBOL', WEIGHT, 'SERIES');\n");
+    printf("   Example: INSERT INTO ELEMENTS VALUES ('UNOBTAINIUM', 'Un', 999.9, 'SYNTHETIC');\n");
     printf("\n3. UPDATE:\n");
-    printf("   UPDATE SUSPECTS SET AGE = 40 WHERE ID = 5;\n");
+    printf("   UPDATE ELEMENTS SET ATOMIC_WEIGHT = 12.011 WHERE ELEMENT_NUMBER = 6;\n");
+    printf("   UPDATE ELEMENTS SET SERIES = 'UPDATED' WHERE SYMBOL = 'H';\n");
     printf("\n4. DELETE:\n");
-    printf("   DELETE FROM SUSPECTS WHERE ID = 5;\n");
+    printf("   DELETE FROM ELEMENTS WHERE ELEMENT_NUMBER = 119;\n");
     printf("\nQUERY MODIFIERS:\n");
     printf("   DISTINCT      - Remove duplicate rows\n");
     printf("   ORDER BY      - Sort results (ASC/DESC)\n");
@@ -48,22 +49,22 @@ void cmd_help(void) {
     printf("\nOPERATORS:\n");
     printf("   Comparison: =, >, <, >=, <=, <>, !=\n");
     printf("   LIKE         - Pattern matching (%% = any chars, _ = single char)\n");
-    printf("   IN           - Match any value in list: AGE IN (25, 30, 35)\n");
-    printf("   BETWEEN      - Range: AGE BETWEEN 25 AND 40\n");
+    printf("   IN           - Match any value in list\n");
+    printf("   BETWEEN      - Range: ATOMIC_WEIGHT BETWEEN 10 AND 50\n");
     printf("\nLOGICAL OPERATORS:\n");
     printf("   AND          - Both conditions must be true\n");
     printf("   OR           - At least one condition must be true\n");
     printf("   NOT          - Negate condition\n");
     printf("\nEXAMPLES:\n");
-    printf("   SELECT * FROM SUSPECTS WHERE AGE BETWEEN 30 AND 50;\n");
-    printf("   SELECT * FROM SUSPECTS WHERE CITY IN ('NEW YORK', 'BOSTON');\n");
-    printf("   SELECT * FROM SUSPECTS WHERE NOT AGE > 50 ORDER BY NAME;\n");
-    printf("   SELECT DISTINCT * FROM SUSPECTS WHERE NAME LIKE 'J%%' LIMIT 5;\n");
+    printf("   SELECT * FROM ELEMENTS WHERE ATOMIC_WEIGHT BETWEEN 50 AND 100;\n");
+    printf("   SELECT * FROM ELEMENTS WHERE SERIES IN ('ALKALI METAL', 'NOBLE GAS');\n");
+    printf("   SELECT * FROM ELEMENTS WHERE SERIES = 'TRANSITION METAL' LIMIT 10;\n");
+    printf("   SELECT DISTINCT * FROM ELEMENTS WHERE ELEMENT_NAME LIKE 'C%%';\n");
     printf("\nOTHER COMMANDS:\n");
     printf("   STATS - Show database statistics\n");
     printf("   HELP  - Show this menu\n");
     printf("   EXIT  - Terminate program\n");
-    printf("\nFIELDS: ID, NAME, CITY, AGE\n");
+    printf("\nFIELDS: ELEMENT_NUMBER (or NUM), ELEMENT_NAME (or NAME), SYMBOL, ATOMIC_WEIGHT (or WEIGHT), SERIES\n");
     printf("\nMEMORY: NO DISK STORAGE - ALL DATA IN RAM\n");
 }
 

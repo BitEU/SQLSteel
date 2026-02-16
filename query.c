@@ -6,41 +6,58 @@
 #include "sqlsteel.h"
 
 /* Get integer field value from record */
-int get_field_value(const char *field, SuspectRecord *rec) {
-    if (strcmp(field, "ID") == 0) return rec->id;
-    if (strcmp(field, "AGE") == 0) return rec->age;
+int get_field_value(const char *field, ElementRecord *rec) {
+    if (strcmp(field, "ELEMENT_NUMBER") == 0 || strcmp(field, "NUM") == 0) return rec->element_number;
     return 0;
 }
 
+/* Get double field value from record */
+double get_field_double(const char *field, ElementRecord *rec) {
+    if (strcmp(field, "ATOMIC_WEIGHT") == 0 || strcmp(field, "WEIGHT") == 0) return rec->atomic_weight;
+    return 0.0;
+}
+
 /* Get string field value from record */
-void get_field_string(const char *field, SuspectRecord *rec, char *dest, int max_len) {
-    if (strcmp(field, "NAME") == 0) {
-        PLATFORM_STRCPY(dest, max_len, rec->name);
-    } else if (strcmp(field, "CITY") == 0) {
-        PLATFORM_STRCPY(dest, max_len, rec->city);
+void get_field_string(const char *field, ElementRecord *rec, char *dest, int max_len) {
+    if (strcmp(field, "ELEMENT_NAME") == 0 || strcmp(field, "NAME") == 0) {
+        PLATFORM_STRCPY(dest, max_len, rec->element_name);
+    } else if (strcmp(field, "SYMBOL") == 0) {
+        PLATFORM_STRCPY(dest, max_len, rec->symbol);
+    } else if (strcmp(field, "SERIES") == 0) {
+        PLATFORM_STRCPY(dest, max_len, rec->series);
     } else {
         dest[0] = '\0';
     }
 }
 
 /* Evaluate a single condition */
-int evaluate_condition(const char *field, const char *op, const char *value, SuspectRecord *rec) {
+int evaluate_condition(const char *field, const char *op, const char *value, ElementRecord *rec) {
     int field_val, comp_val;
+    double field_dbl, comp_dbl;
     char field_str[64];
     char value_upper[64];
     
-    /* Try integer comparison first */
-    field_val = get_field_value(field, rec);
-    comp_val = atoi(value);
-    
     /* Check if this is an integer field */
-    if (strcmp(field, "ID") == 0 || strcmp(field, "AGE") == 0) {
+    if (strcmp(field, "ELEMENT_NUMBER") == 0 || strcmp(field, "NUM") == 0) {
+        field_val = get_field_value(field, rec);
+        comp_val = atoi(value);
         if (strcmp(op, "=") == 0) return field_val == comp_val;
         if (strcmp(op, ">") == 0) return field_val > comp_val;
         if (strcmp(op, "<") == 0) return field_val < comp_val;
         if (strcmp(op, ">=") == 0) return field_val >= comp_val;
         if (strcmp(op, "<=") == 0) return field_val <= comp_val;
         if (strcmp(op, "<>") == 0 || strcmp(op, "!=") == 0) return field_val != comp_val;
+    }
+    /* Check if this is a double field */
+    else if (strcmp(field, "ATOMIC_WEIGHT") == 0 || strcmp(field, "WEIGHT") == 0) {
+        field_dbl = get_field_double(field, rec);
+        comp_dbl = atof(value);
+        if (strcmp(op, "=") == 0) return field_dbl == comp_dbl;
+        if (strcmp(op, ">") == 0) return field_dbl > comp_dbl;
+        if (strcmp(op, "<") == 0) return field_dbl < comp_dbl;
+        if (strcmp(op, ">=") == 0) return field_dbl >= comp_dbl;
+        if (strcmp(op, "<=") == 0) return field_dbl <= comp_dbl;
+        if (strcmp(op, "<>") == 0 || strcmp(op, "!=") == 0) return field_dbl != comp_dbl;
     }
     /* String comparison */
     else {
@@ -94,7 +111,7 @@ int pattern_match(const char *text, const char *pattern) {
 }
 
 /* Evaluate WHERE clause */
-int evaluate_where_clause(Parser *parser, SuspectRecord *rec, int *pos) {
+int evaluate_where_clause(Parser *parser, ElementRecord *rec, int *pos) {
     int result = 1;
     int i = *pos;
     int current_result = 1;
@@ -248,30 +265,32 @@ int evaluate_where_clause(Parser *parser, SuspectRecord *rec, int *pos) {
 
 /* Helper: Compare two records for sorting */
 int compare_records(const void *a, const void *b, const char *field, int desc) {
-    const SuspectRecord *r1 = (const SuspectRecord *)a;
-    const SuspectRecord *r2 = (const SuspectRecord *)b;
+    const ElementRecord *r1 = (const ElementRecord *)a;
+    const ElementRecord *r2 = (const ElementRecord *)b;
     int result = 0;
     
-    if (strcmp(field, "ID") == 0) {
-        result = r1->id - r2->id;
-    } else if (strcmp(field, "AGE") == 0) {
-        result = r1->age - r2->age;
-    } else if (strcmp(field, "NAME") == 0) {
-        result = strcmp(r1->name, r2->name);
-    } else if (strcmp(field, "CITY") == 0) {
-        result = strcmp(r1->city, r2->city);
+    if (strcmp(field, "ELEMENT_NUMBER") == 0 || strcmp(field, "NUM") == 0) {
+        result = r1->element_number - r2->element_number;
+    } else if (strcmp(field, "ATOMIC_WEIGHT") == 0 || strcmp(field, "WEIGHT") == 0) {
+        result = (r1->atomic_weight > r2->atomic_weight) ? 1 : ((r1->atomic_weight < r2->atomic_weight) ? -1 : 0);
+    } else if (strcmp(field, "ELEMENT_NAME") == 0 || strcmp(field, "NAME") == 0) {
+        result = strcmp(r1->element_name, r2->element_name);
+    } else if (strcmp(field, "SYMBOL") == 0) {
+        result = strcmp(r1->symbol, r2->symbol);
+    } else if (strcmp(field, "SERIES") == 0) {
+        result = strcmp(r1->series, r2->series);
     }
     
     return desc ? -result : result;
 }
 
 /* Quick sort implementation for records */
-void sort_records(SuspectRecord *arr, int left, int right, const char *field, int desc) {
+void sort_records(ElementRecord *arr, int left, int right, const char *field, int desc) {
     if (left >= right) return;
     
     int i = left, j = right;
-    SuspectRecord pivot = arr[(left + right) / 2];
-    SuspectRecord temp;
+    ElementRecord pivot = arr[(left + right) / 2];
+    ElementRecord temp;
     
     while (i <= j) {
         while (compare_records(&arr[i], &pivot, field, desc) < 0) i++;
@@ -291,12 +310,12 @@ void sort_records(SuspectRecord *arr, int left, int right, const char *field, in
 }
 
 /* Check if record is duplicate in result set */
-int is_duplicate(SuspectRecord *results, int count, SuspectRecord *rec) {
+int is_duplicate(ElementRecord *results, int count, ElementRecord *rec) {
     int i;
     for (i = 0; i < count; i++) {
-        if (strcmp(results[i].name, rec->name) == 0 &&
-            strcmp(results[i].city, rec->city) == 0 &&
-            results[i].age == rec->age) {
+        if (strcmp(results[i].element_name, rec->element_name) == 0 &&
+            strcmp(results[i].symbol, rec->symbol) == 0 &&
+            results[i].atomic_weight == rec->atomic_weight) {
             return 1;
         }
     }
@@ -308,7 +327,7 @@ void execute_select(Parser *parser) {
     int i, count = 0;
     int has_where = 0;
     int where_pos = 0;
-    SuspectRecord results[MAX_RECORDS];
+    ElementRecord results[MAX_RECORDS];
     int result_count = 0;
     
     /* Initialize parser state */
@@ -435,7 +454,7 @@ void execute_select(Parser *parser) {
 /* Execute INSERT statement */
 void execute_insert(Parser *parser) {
     int i, slot = -1;
-    SuspectRecord new_rec;
+    ElementRecord new_rec;
     
     /* Find empty slot */
     for (i = 0; i < MAX_RECORDS; i++) {
@@ -450,8 +469,8 @@ void execute_insert(Parser *parser) {
         return;
     }
     
-    /* Parse INSERT INTO suspects VALUES (...) */
-    /* Simplified: expects 3 values in order */
+    /* Parse INSERT INTO ELEMENTS VALUES (...) */
+    /* Simplified: expects 4 values in order: name, symbol, weight, series */
     int value_start = 0;
     for (i = 0; i < parser->token_count; i++) {
         if (parser->tokens[i].type == TOKEN_VALUES) {
@@ -462,7 +481,7 @@ void execute_insert(Parser *parser) {
     
     if (value_start == 0) {
         printf("ERROR: INVALID INSERT SYNTAX\n");
-        printf("USAGE: INSERT INTO SUSPECTS VALUES ('NAME', 'CITY', AGE)\n");
+        printf("USAGE: INSERT INTO ELEMENTS VALUES ('ELEMENT_NAME', 'SYMBOL', WEIGHT, 'SERIES')\n");
         return;
     }
     
@@ -474,9 +493,9 @@ void execute_insert(Parser *parser) {
     int field_num = 0;
     
     new_rec.active = 1;
-    new_rec.id = slot + 1;
+    new_rec.element_number = slot + 1;
     
-    while (val_idx < parser->token_count && field_num < 3) {
+    while (val_idx < parser->token_count && field_num < 4) {
         if (parser->tokens[val_idx].type == TOKEN_COMMA) {
             val_idx++;
             continue;
@@ -484,14 +503,17 @@ void execute_insert(Parser *parser) {
         if (parser->tokens[val_idx].type == TOKEN_RPAREN) break;
         
         switch (field_num) {
-            case 0: /* NAME */
-                PLATFORM_STRCPY(new_rec.name, MAX_NAME_LEN, parser->tokens[val_idx].value);
+            case 0: /* ELEMENT_NAME */
+                PLATFORM_STRCPY(new_rec.element_name, MAX_NAME_LEN, parser->tokens[val_idx].value);
                 break;
-            case 1: /* CITY */
-                PLATFORM_STRCPY(new_rec.city, MAX_CITY_LEN, parser->tokens[val_idx].value);
+            case 1: /* SYMBOL */
+                PLATFORM_STRCPY(new_rec.symbol, MAX_SYMBOL_LEN, parser->tokens[val_idx].value);
                 break;
-            case 2: /* AGE */
-                new_rec.age = atoi(parser->tokens[val_idx].value);
+            case 2: /* ATOMIC_WEIGHT */
+                new_rec.atomic_weight = atof(parser->tokens[val_idx].value);
+                break;
+            case 3: /* SERIES */
+                PLATFORM_STRCPY(new_rec.series, MAX_SERIES_LEN, parser->tokens[val_idx].value);
                 break;
         }
         
@@ -499,13 +521,13 @@ void execute_insert(Parser *parser) {
         val_idx++;
     }
     
-    if (field_num == 3) {
+    if (field_num == 4) {
         g_database[slot] = new_rec;
         g_record_count++;
-        printf("RECORD INSERTED: ID=%d (NAME: %s)\n", new_rec.id, new_rec.name);
+        printf("ELEMENT INSERTED: NUM=%d (NAME: %s, SYMBOL: %s)\n", new_rec.element_number, new_rec.element_name, new_rec.symbol);
     } else {
-        printf("ERROR: INSUFFICIENT VALUES (EXPECTED 3, GOT %d)\n", field_num);
-        printf("USAGE: INSERT INTO SUSPECTS VALUES ('NAME', 'CITY', AGE)\n");
+        printf("ERROR: INSUFFICIENT VALUES (EXPECTED 4, GOT %d)\n", field_num);
+        printf("USAGE: INSERT INTO ELEMENTS VALUES ('ELEMENT_NAME', 'SYMBOL', WEIGHT, 'SERIES')\n");
     }
 }
 
@@ -526,7 +548,7 @@ void execute_delete(Parser *parser) {
     
     if (!has_where) {
         printf("ERROR: DELETE REQUIRES WHERE CLAUSE (SAFETY)\n");
-        printf("USAGE: DELETE FROM SUSPECTS WHERE <condition>\n");
+        printf("USAGE: DELETE FROM ELEMENTS WHERE <condition>\n");
         return;
     }
     
@@ -566,7 +588,7 @@ void execute_update(Parser *parser) {
     
     if (set_pos == 0) {
         printf("ERROR: UPDATE REQUIRES SET CLAUSE\n");
-        printf("USAGE: UPDATE SUSPECTS SET FIELD=VALUE WHERE <condition>\n");
+        printf("USAGE: UPDATE ELEMENTS SET FIELD=VALUE WHERE <condition>\n");
         return;
     }
     
@@ -595,8 +617,14 @@ void execute_update(Parser *parser) {
             
             if (matches) {
                 /* Apply update */
-                if (strcmp(update_field, "AGE") == 0) {
-                    g_database[i].age = atoi(update_value);
+                if (strcmp(update_field, "ATOMIC_WEIGHT") == 0 || strcmp(update_field, "WEIGHT") == 0) {
+                    g_database[i].atomic_weight = atof(update_value);
+                } else if (strcmp(update_field, "ELEMENT_NAME") == 0 || strcmp(update_field, "NAME") == 0) {
+                    PLATFORM_STRCPY(g_database[i].element_name, MAX_NAME_LEN, update_value);
+                } else if (strcmp(update_field, "SYMBOL") == 0) {
+                    PLATFORM_STRCPY(g_database[i].symbol, MAX_SYMBOL_LEN, update_value);
+                } else if (strcmp(update_field, "SERIES") == 0) {
+                    PLATFORM_STRCPY(g_database[i].series, MAX_SERIES_LEN, update_value);
                 }
                 count++;
             }

@@ -9,9 +9,6 @@
 int get_field_value(const char *field, SuspectRecord *rec) {
     if (strcmp(field, "ID") == 0) return rec->id;
     if (strcmp(field, "AGE") == 0) return rec->age;
-    if (strcmp(field, "SUSPICION_LEVEL") == 0) return rec->suspicion_level;
-    if (strcmp(field, "CONTACTS_MONITORED") == 0) return rec->contacts_monitored;
-    if (strcmp(field, "REPORTS_FILED") == 0) return rec->reports_filed;
     return 0;
 }
 
@@ -21,8 +18,6 @@ void get_field_string(const char *field, SuspectRecord *rec, char *dest, int max
         PLATFORM_STRCPY(dest, max_len, rec->name);
     } else if (strcmp(field, "CITY") == 0) {
         PLATFORM_STRCPY(dest, max_len, rec->city);
-    } else if (strcmp(field, "OCCUPATION") == 0) {
-        PLATFORM_STRCPY(dest, max_len, rec->occupation);
     } else if (strcmp(field, "NOTES") == 0) {
         PLATFORM_STRCPY(dest, max_len, rec->notes);
     } else {
@@ -41,10 +36,7 @@ int evaluate_condition(const char *field, const char *op, const char *value, Sus
     comp_val = atoi(value);
     
     /* Check if this is an integer field */
-    if (strcmp(field, "ID") == 0 || strcmp(field, "AGE") == 0 || 
-        strcmp(field, "SUSPICION_LEVEL") == 0 || strcmp(field, "CONTACTS_MONITORED") == 0 ||
-        strcmp(field, "REPORTS_FILED") == 0) {
-        
+    if (strcmp(field, "ID") == 0 || strcmp(field, "AGE") == 0) {
         if (strcmp(op, "=") == 0) return field_val == comp_val;
         if (strcmp(op, ">") == 0) return field_val > comp_val;
         if (strcmp(op, "<") == 0) return field_val < comp_val;
@@ -180,7 +172,7 @@ void execute_insert(Parser *parser) {
     }
     
     /* Parse INSERT INTO suspects VALUES (...) */
-    /* Simplified: expects 8 values in order */
+    /* Simplified: expects 4 values in order */
     int value_start = 0;
     for (i = 0; i < parser->token_count; i++) {
         if (parser->tokens[i].type == TOKEN_VALUES) {
@@ -191,7 +183,7 @@ void execute_insert(Parser *parser) {
     
     if (value_start == 0) {
         printf("ERROR: INVALID INSERT SYNTAX\n");
-        printf("USAGE: INSERT INTO SUSPECTS VALUES ('NAME', 'CITY', 'OCCUPATION', AGE, SUSPICION, CONTACTS, REPORTS, 'NOTES')\n");
+        printf("USAGE: INSERT INTO SUSPECTS VALUES ('NAME', 'CITY', AGE, 'NOTES')\n");
         return;
     }
     
@@ -205,7 +197,7 @@ void execute_insert(Parser *parser) {
     new_rec.active = 1;
     new_rec.id = slot + 1;
     
-    while (val_idx < parser->token_count && field_num < 8) {
+    while (val_idx < parser->token_count && field_num < 4) {
         if (parser->tokens[val_idx].type == TOKEN_COMMA) {
             val_idx++;
             continue;
@@ -219,22 +211,10 @@ void execute_insert(Parser *parser) {
             case 1: /* CITY */
                 PLATFORM_STRCPY(new_rec.city, MAX_CITY_LEN, parser->tokens[val_idx].value);
                 break;
-            case 2: /* OCCUPATION */
-                PLATFORM_STRCPY(new_rec.occupation, MAX_OCCUPATION_LEN, parser->tokens[val_idx].value);
-                break;
-            case 3: /* AGE */
+            case 2: /* AGE */
                 new_rec.age = atoi(parser->tokens[val_idx].value);
                 break;
-            case 4: /* SUSPICION_LEVEL */
-                new_rec.suspicion_level = atoi(parser->tokens[val_idx].value);
-                break;
-            case 5: /* CONTACTS_MONITORED */
-                new_rec.contacts_monitored = atoi(parser->tokens[val_idx].value);
-                break;
-            case 6: /* REPORTS_FILED */
-                new_rec.reports_filed = atoi(parser->tokens[val_idx].value);
-                break;
-            case 7: /* NOTES */
+            case 3: /* NOTES */
                 PLATFORM_STRCPY(new_rec.notes, MAX_NOTES_LEN, parser->tokens[val_idx].value);
                 break;
         }
@@ -243,13 +223,13 @@ void execute_insert(Parser *parser) {
         val_idx++;
     }
     
-    if (field_num == 8) {
+    if (field_num == 4) {
         g_database[slot] = new_rec;
         g_record_count++;
         printf("RECORD INSERTED: ID=%d (NAME: %s)\n", new_rec.id, new_rec.name);
     } else {
-        printf("ERROR: INSUFFICIENT VALUES (EXPECTED 8, GOT %d)\n", field_num);
-        printf("USAGE: INSERT INTO SUSPECTS VALUES ('NAME', 'CITY', 'OCCUPATION', AGE, SUSPICION, CONTACTS, REPORTS, 'NOTES')\n");
+        printf("ERROR: INSUFFICIENT VALUES (EXPECTED 4, GOT %d)\n", field_num);
+        printf("USAGE: INSERT INTO SUSPECTS VALUES ('NAME', 'CITY', AGE, 'NOTES')\n");
     }
 }
 
@@ -339,14 +319,8 @@ void execute_update(Parser *parser) {
             
             if (matches) {
                 /* Apply update */
-                if (strcmp(update_field, "SUSPICION_LEVEL") == 0) {
-                    g_database[i].suspicion_level = atoi(update_value);
-                } else if (strcmp(update_field, "AGE") == 0) {
+                if (strcmp(update_field, "AGE") == 0) {
                     g_database[i].age = atoi(update_value);
-                } else if (strcmp(update_field, "CONTACTS_MONITORED") == 0) {
-                    g_database[i].contacts_monitored = atoi(update_value);
-                } else if (strcmp(update_field, "REPORTS_FILED") == 0) {
-                    g_database[i].reports_filed = atoi(update_value);
                 } else if (strcmp(update_field, "NOTES") == 0) {
                     PLATFORM_STRCPY(g_database[i].notes, MAX_NOTES_LEN, update_value);
                 }

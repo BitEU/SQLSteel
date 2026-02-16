@@ -49,12 +49,6 @@ static const char *cities[] = {
     "LAS VEGAS", "PORTLAND", "MINNEAPOLIS", "ST LOUIS"
 };
 
-static const char *occupations[] = {
-    "GOVT CLERK", "SCIENTIST", "DIPLOMAT", "ENGINEER", "JOURNALIST",
-    "PROFESSOR", "TRANSLATOR", "ANALYST", "SECRETARY", "MILITARY",
-    "TECHNICIAN", "RESEARCHER", "COURIER", "ATTACHE", "CONSULTANT"
-};
-
 static const char *notes[] = {
     "FREQUENT USSR CONTACTS", "UNEXPLAINED WEALTH", "CODED MESSAGES",
     "DEAD DROP OBSERVED", "KNOWN ASSOCIATES", "EMBASSY MEETINGS",
@@ -132,20 +126,16 @@ void load_demo_data(void) {
     for (i = 0; i < 100; i++) {
         g_database[i].id = i + 1;
         g_database[i].active = 1;
-        
+
         /* Generate random name */
         generate_random_name(g_database[i].name, MAX_NAME_LEN);
-        
-        /* Assign city, occupation, notes using portable string copy */
+
+        /* Assign city, notes using portable string copy */
         PLATFORM_STRCPY(g_database[i].city, MAX_CITY_LEN, cities[pseudo_rand() % 20]);
-        PLATFORM_STRCPY(g_database[i].occupation, MAX_OCCUPATION_LEN, occupations[pseudo_rand() % 15]);
         PLATFORM_STRCPY(g_database[i].notes, MAX_NOTES_LEN, notes[pseudo_rand() % 15]);
-        
+
         /* Generate realistic data */
         g_database[i].age = 25 + (pseudo_rand() % 40);
-        g_database[i].suspicion_level = 1 + (pseudo_rand() % 10);
-        g_database[i].contacts_monitored = pseudo_rand() % 20;
-        g_database[i].reports_filed = pseudo_rand() % 25;
     }
     
     g_record_count = 100;

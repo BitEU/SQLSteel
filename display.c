@@ -14,7 +14,7 @@ void print_header(void) {
 
 /* Print separator line */
 void print_separator(void) {
-    printf("#-----#----------------------#------------------#-----+\n");
+    printf("#-----#----------------------#------------------#-----#\n");
 }
 
 /* Print single record (table format) */

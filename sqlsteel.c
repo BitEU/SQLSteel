@@ -99,8 +99,7 @@ int main(void) {
         
         /* Convert to uppercase for comparison */
         char cmd_check[MAX_SQL_LEN];
-        strncpy(cmd_check, sql_buffer, MAX_SQL_LEN - 1);
-        cmd_check[MAX_SQL_LEN - 1] = '\0';
+        PLATFORM_STRCPY(cmd_check, MAX_SQL_LEN, sql_buffer);
         to_upper(cmd_check);
         
         /* Check for special commands */

@@ -11,6 +11,49 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include <stdint.h>
+
+/* Platform-specific configuration */
+#ifdef UNIVAC
+    /* UNIVAC-specific macros for portability */
+    /* Safe string copy - ensures null termination and avoids truncation warnings */
+    static inline void platform_strcpy_safe(char *dest, size_t dest_size, const char *src) {
+        if (dest_size > 0) {
+            size_t i;
+            for (i = 0; i < dest_size - 1 && src[i] != '\0'; i++) {
+                dest[i] = src[i];
+            }
+            dest[i] = '\0';
+        }
+    }
+    
+    #define PLATFORM_STRCPY(dest, dest_size, src) platform_strcpy_safe(dest, dest_size, src)
+    #define CLEAR_SCREEN() printf("\n\n\n")  /* Simple clear for UNIVAC */
+    
+    /* Fixed-width types for UNIVAC compatibility */
+    typedef int32_t sql_int_t;
+    typedef uint16_t sql_uint16_t;
+#else
+    /* Windows-specific includes */
+    /* Note: Currently not using windows.h - fully portable */
+    
+    static inline void platform_strcpy_safe(char *dest, size_t dest_size, const char *src) {
+        if (dest_size > 0) {
+            size_t i;
+            for (i = 0; i < dest_size - 1 && src[i] != '\0'; i++) {
+                dest[i] = src[i];
+            }
+            dest[i] = '\0';
+        }
+    }
+    
+    #define PLATFORM_STRCPY(dest, dest_size, src) platform_strcpy_safe(dest, dest_size, src)
+    #define CLEAR_SCREEN() printf("\033[2J\033[H")  /* ANSI clear */
+    
+    /* Fixed-width types for standard platforms */
+    typedef int32_t sql_int_t;
+    typedef uint16_t sql_uint16_t;
+#endif
 
 /* Memory constraints for UNIVAC (40kB total) */
 #define MAX_RECORDS 100
@@ -24,16 +67,16 @@
 
 /* Table structure - Suspected Soviet Sympathies Database */
 typedef struct {
-    int id;
+    sql_int_t id;
     char name[MAX_NAME_LEN];
     char city[MAX_CITY_LEN];
     char occupation[MAX_OCCUPATION_LEN];
-    int age;
-    int suspicion_level;      /* 1-10 scale */
-    int contacts_monitored;
-    int reports_filed;
+    sql_int_t age;
+    sql_int_t suspicion_level;      /* 1-10 scale */
+    sql_int_t contacts_monitored;
+    sql_int_t reports_filed;
     char notes[MAX_NOTES_LEN];
-    int active;               /* 1=active, 0=deleted */
+    sql_int_t active;               /* 1=active, 0=deleted */
 } SuspectRecord;
 
 /* SQL Token Types */
@@ -75,8 +118,8 @@ typedef struct {
 /* SQL Parser state */
 typedef struct {
     Token tokens[MAX_TOKENS];
-    int token_count;
-    int current_token;
+    sql_int_t token_count;
+    sql_int_t current_token;
 } Parser;
 
 /* Function prototypes - Database operations */
@@ -114,6 +157,6 @@ const char* get_next_token(const char *sql, char *token, int max_len);
 
 /* Global database */
 extern SuspectRecord g_database[MAX_RECORDS];
-extern int g_record_count;
+extern sql_int_t g_record_count;
 
 #endif /* SQLSTEEL_H */

@@ -7,7 +7,7 @@
 
 /* Global in-memory database */
 SuspectRecord g_database[MAX_RECORDS];
-int g_record_count = 0;
+sql_int_t g_record_count = 0;
 
 /* Name generation data */
 static const char *first_names[] = {
@@ -85,8 +85,31 @@ void generate_random_name(char *dest, int max_len) {
     int first_idx = pseudo_rand() % (sizeof(first_names) / sizeof(first_names[0]));
     int last_idx = pseudo_rand() % (sizeof(last_names) / sizeof(last_names[0]));
     
+#ifdef UNIVAC
+    /* UNIVAC-compatible string formatting */
+    int written = 0;
+    int i, j;
+    
+    /* Copy first name */
+    for (i = 0; first_names[first_idx][i] != '\0' && written < max_len - 2; i++) {
+        dest[written++] = first_names[first_idx][i];
+    }
+    
+    /* Add space */
+    if (written < max_len - 1) {
+        dest[written++] = ' ';
+    }
+    
+    /* Copy last name */
+    for (j = 0; last_names[last_idx][j] != '\0' && written < max_len - 1; j++) {
+        dest[written++] = last_names[last_idx][j];
+    }
+    
+    dest[written] = '\0';
+#else
     snprintf(dest, max_len, "%s %s", first_names[first_idx], last_names[last_idx]);
     dest[max_len - 1] = '\0';
+#endif
 }
 
 /* Initialize database */
@@ -113,15 +136,10 @@ void load_demo_data(void) {
         /* Generate random name */
         generate_random_name(g_database[i].name, MAX_NAME_LEN);
         
-        /* Assign city, occupation, notes */
-        strncpy(g_database[i].city, cities[pseudo_rand() % 20], MAX_CITY_LEN - 1);
-        g_database[i].city[MAX_CITY_LEN - 1] = '\0';
-        
-        strncpy(g_database[i].occupation, occupations[pseudo_rand() % 15], MAX_OCCUPATION_LEN - 1);
-        g_database[i].occupation[MAX_OCCUPATION_LEN - 1] = '\0';
-        
-        strncpy(g_database[i].notes, notes[pseudo_rand() % 15], MAX_NOTES_LEN - 1);
-        g_database[i].notes[MAX_NOTES_LEN - 1] = '\0';
+        /* Assign city, occupation, notes using portable string copy */
+        PLATFORM_STRCPY(g_database[i].city, MAX_CITY_LEN, cities[pseudo_rand() % 20]);
+        PLATFORM_STRCPY(g_database[i].occupation, MAX_OCCUPATION_LEN, occupations[pseudo_rand() % 15]);
+        PLATFORM_STRCPY(g_database[i].notes, MAX_NOTES_LEN, notes[pseudo_rand() % 15]);
         
         /* Generate realistic data */
         g_database[i].age = 25 + (pseudo_rand() % 40);

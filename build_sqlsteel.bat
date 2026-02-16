@@ -107,14 +107,14 @@ if %ERRORLEVEL% EQU 0 (
     echo Output: sqlsteel_univac.exe
 
     REM Display file size
-    for %%A in (sqlsteel_univac.exe^) do (
+    for %%A in (sqlsteel_univac.exe) do (
         echo File size: %%~zA bytes
     )
     echo.
-    echo Platform: UNIVAC ^(cross-compiled with -DUNIVAC^)
+    echo Platform: UNIVAC (cross-compiled with -DUNIVAC)
     echo.
     echo NOTE: This executable is built for UNIVAC compatibility:
-    echo   - No Windows dependencies ^(windows.h, time.h limited^)
+    echo   - No Windows dependencies (windows.h, time.h limited)
     echo   - All data in-memory only (no disk I/O)
     echo   - 40KB memory footprint
     echo   - Uses strncpy instead of strcpy_s

@@ -1,15 +1,6 @@
 # SQLSteel - Ultra-Lightweight In-Memory Database for UNIVAC 1219
 
-An ultra-minimal SQL database engine designed for 1960s UNIVAC systems with only 40kB of memory. Everything runs in RAM - no disk I/O whatsoever.
-
-## Features
-
-- **Full SQL Parser**: Tokenizer and parser for SQL commands
-- **SQL Operations**: SELECT, INSERT, UPDATE, DELETE
-- **WHERE Clauses**: Supports conditions with =, >, <, >=, <=, AND operators
-- **Dynamic Data Generation**: Random name generation using first/last name combinations
-- **In-Memory Only**: All data created and destroyed at runtime
-- **Modular Design**: Proper separation with header files
+An ultra-minimal SQL database engine. Everything runs in RAM - no disk I/O or persistence whatsoever.
 
 ## Architecture
 
@@ -101,53 +92,3 @@ build_oregon.bat
 build_oregon.bat
 [Select 2 for UNIVAC]
 ```
-
-## Memory Footprint
-
-- Database: ~15KB (100 records × ~150 bytes each)
-- Code: ~10-15KB (depending on compiler optimization)
-- Total: ~25-30KB (well under 40KB limit)
-
-## UNIVAC Compatibility
-
-- No dynamic memory allocation (malloc/free)
-- Fixed-size arrays
-- Simple pseudo-random number generator (no stdlib rand())
-- No floating-point operations
-- Standard C89/C99 only
-- No platform-specific dependencies
-
-## Technical Details
-
-### Tokenizer
-Converts SQL strings into tokens:
-- Keywords (SELECT, INSERT, WHERE, etc.)
-- Identifiers (field names)
-- Operators (=, >, <, >=, <=)
-- Strings ('value')
-- Numbers (123)
-
-### Parser
-Recursive descent parser that builds execution plan from tokens.
-
-### Query Evaluator
-Evaluates WHERE clauses by:
-1. Iterating through all active records
-2. Testing each condition against record fields
-3. Combining conditions with AND logic
-4. Returning matching records
-
-## Limitations
-
-- Maximum 100 records
-- Single table only
-- No JOIN operations
-- No ORDER BY or GROUP BY
-- No aggregate functions (COUNT, SUM, etc.)
-- WHERE clauses support AND but not OR
-- Single field updates only
-- String matching is exact (case-insensitive)
-
-## License
-
-Public domain - designed for educational purposes and UNIVAC nostalgia.

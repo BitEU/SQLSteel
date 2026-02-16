@@ -85,12 +85,29 @@ typedef enum {
     TOKEN_SET,
     TOKEN_AND,
     TOKEN_OR,
+    TOKEN_NOT,
+    TOKEN_DISTINCT,
+    TOKEN_ORDER,
+    TOKEN_BY,
+    TOKEN_LIMIT,
+    TOKEN_OFFSET,
+    TOKEN_FETCH,
+    TOKEN_FIRST,
+    TOKEN_NEXT,
+    TOKEN_ROWS,
+    TOKEN_ONLY,
+    TOKEN_LIKE,
+    TOKEN_IN,
+    TOKEN_BETWEEN,
+    TOKEN_ASC,
+    TOKEN_DESC,
     TOKEN_ASTERISK,
     TOKEN_EQUALS,
     TOKEN_GT,
     TOKEN_LT,
     TOKEN_GTE,
     TOKEN_LTE,
+    TOKEN_NE,
     TOKEN_LPAREN,
     TOKEN_RPAREN,
     TOKEN_COMMA,
@@ -113,6 +130,12 @@ typedef struct {
     Token tokens[MAX_TOKENS];
     sql_int_t token_count;
     sql_int_t current_token;
+    sql_int_t use_distinct;      /* Flag for DISTINCT */
+    sql_int_t limit_count;       /* LIMIT value (-1 = no limit) */
+    sql_int_t offset_count;      /* OFFSET value (0 = no offset) */
+    sql_int_t use_order_by;      /* Flag for ORDER BY */
+    char order_field[MAX_TOKEN_LEN];  /* Field to order by */
+    sql_int_t order_desc;        /* 1=DESC, 0=ASC */
 } Parser;
 
 /* Function prototypes - Database operations */
@@ -133,6 +156,7 @@ void execute_update(Parser *parser);
 /* Function prototypes - Query evaluation */
 int evaluate_where_clause(Parser *parser, SuspectRecord *rec, int *pos);
 int evaluate_condition(const char *field, const char *op, const char *value, SuspectRecord *rec);
+int pattern_match(const char *text, const char *pattern);
 int get_field_value(const char *field, SuspectRecord *rec);
 void get_field_string(const char *field, SuspectRecord *rec, char *dest, int max_len);
 

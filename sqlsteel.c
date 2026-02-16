@@ -29,6 +29,9 @@ void cmd_help(void) {
     printf("\n1. SELECT:\n");
     printf("   SELECT * FROM SUSPECTS;\n");
     printf("   SELECT * FROM SUSPECTS WHERE AGE > 30 AND CITY = 'NEW YORK';\n");
+    printf("   SELECT DISTINCT * FROM SUSPECTS WHERE CITY = 'BOSTON';\n");
+    printf("   SELECT * FROM SUSPECTS ORDER BY AGE DESC LIMIT 10;\n");
+    printf("   SELECT * FROM SUSPECTS WHERE NAME LIKE 'JOHN%%' ORDER BY NAME;\n");
     printf("\n2. INSERT:\n");
     printf("   INSERT INTO SUSPECTS VALUES ('NAME', 'CITY', AGE);\n");
     printf("   Example: INSERT INTO SUSPECTS VALUES ('JOHN DOE', 'BOSTON', 35);\n");
@@ -36,13 +39,32 @@ void cmd_help(void) {
     printf("   UPDATE SUSPECTS SET AGE = 40 WHERE ID = 5;\n");
     printf("\n4. DELETE:\n");
     printf("   DELETE FROM SUSPECTS WHERE ID = 5;\n");
+    printf("\nQUERY MODIFIERS:\n");
+    printf("   DISTINCT      - Remove duplicate rows\n");
+    printf("   ORDER BY      - Sort results (ASC/DESC)\n");
+    printf("   LIMIT n       - Return only n rows\n");
+    printf("   OFFSET n      - Skip first n rows\n");
+    printf("   FETCH FIRST n ROWS ONLY - SQL standard limit\n");
+    printf("\nOPERATORS:\n");
+    printf("   Comparison: =, >, <, >=, <=, <>, !=\n");
+    printf("   LIKE         - Pattern matching (%% = any chars, _ = single char)\n");
+    printf("   IN           - Match any value in list: AGE IN (25, 30, 35)\n");
+    printf("   BETWEEN      - Range: AGE BETWEEN 25 AND 40\n");
+    printf("\nLOGICAL OPERATORS:\n");
+    printf("   AND          - Both conditions must be true\n");
+    printf("   OR           - At least one condition must be true\n");
+    printf("   NOT          - Negate condition\n");
+    printf("\nEXAMPLES:\n");
+    printf("   SELECT * FROM SUSPECTS WHERE AGE BETWEEN 30 AND 50;\n");
+    printf("   SELECT * FROM SUSPECTS WHERE CITY IN ('NEW YORK', 'BOSTON');\n");
+    printf("   SELECT * FROM SUSPECTS WHERE NOT AGE > 50 ORDER BY NAME;\n");
+    printf("   SELECT DISTINCT * FROM SUSPECTS WHERE NAME LIKE 'J%%' LIMIT 5;\n");
     printf("\nOTHER COMMANDS:\n");
     printf("   STATS - Show database statistics\n");
     printf("   HELP  - Show this menu\n");
     printf("   EXIT  - Terminate program\n");
     printf("\nFIELDS: ID, NAME, CITY, AGE\n");
-    printf("OPERATORS: =, >, <, >=, <=, AND\n");
-    printf("\nMEMORY: NO DISK STORAGE\n");
+    printf("\nMEMORY: NO DISK STORAGE - ALL DATA IN RAM\n");
 }
 
 /* Main program */
